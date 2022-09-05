@@ -1,0 +1,10 @@
+{
+  "name": "gap-analyzer",
+  "version": "1.0.0",
+  "description": "De-Gapperの出力形式を自分の研究用に書き換えるプログラム",
+  "main": "index.js",
+  "repository": "https://github.com/salieri256/GapAnalyzer",
+  "author": "salieri256",
+  "license": "MIT",
+  "private": true
+}

@@ -14,7 +14,7 @@ const main = async () => {
             return process.argv[2]
         }
         else {
-            console.log('dir: ')
+            console.log('report.html path: ')
             return (await asyncio.next()).value
         }
     })()
@@ -24,7 +24,7 @@ const main = async () => {
             return await readFile(filePath, 'utf-8')
         }
         catch (e) {
-            console.log('File not found.')
+            console.log('Could not open file.')
             process.exit(1)
         }
     })()

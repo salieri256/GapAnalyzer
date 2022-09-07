@@ -1,4 +1,5 @@
 import { readFile } from 'fs/promises'
+import { createWriteStream } from 'fs'
 import { createInterface } from 'readline'
 import { JSDOM } from 'jsdom'
 
@@ -83,6 +84,13 @@ const main = async () => {
             detectionResults.push(detectionResult)
         }
     }
+
+    const stream = createWriteStream(outputFilePath)
+    stream.write('file name,new elements,major elements,tail paths,minor elements\n')
+    detectionResults.forEach(res => {
+        stream.write(`${res.title},${res.detail.newElementNum},${res.detail.majorElementNum},${res.detail.majorTailPathNum},${res.detail.minorElementNum}\n`)
+    })
+    stream.end()
 
     io.close()
 }

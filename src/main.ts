@@ -9,7 +9,7 @@ const main = async () => {
     })
     const asyncio = io[Symbol.asyncIterator]()
 
-    const filePath = await (async () => {
+    const inputFilePath = await (async () => {
         if (process.argv[2]) {
             return process.argv[2]
         }
@@ -19,9 +19,19 @@ const main = async () => {
         }
     })()
 
+    const outputFilePath = await (async () => {
+        if (process.argv[3]) {
+            return process.argv[3]
+        }
+        else {
+            console.log('output csv path: ')
+            return (await asyncio.next()).value
+        }
+    })()
+
     const html = await (async () => {
         try {
-            return await readFile(filePath, 'utf-8')
+            return await readFile(inputFilePath, 'utf-8')
         }
         catch (e) {
             console.log('Could not open file.')

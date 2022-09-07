@@ -2,6 +2,17 @@ import { readFile } from 'fs/promises'
 import { createInterface } from 'readline'
 import { JSDOM } from 'jsdom'
 
+const extractDetectionDetail = (text: string) => {
+    const texts = text.trim().split(' ')
+
+    return {
+        newElementNum: Number( texts[0] ),
+        majorElementNum: Number( texts[3].slice(1, texts[3].length) ),
+        majorTailPathNum: Number( texts[4].slice(6, texts[4].length) ),
+        minorElementNum: Number( texts[6] ),
+    }
+}
+
 const main = async () => {
     const io = createInterface({
         input: process.stdin,
@@ -40,6 +51,38 @@ const main = async () => {
     })()
 
     const dom = new JSDOM(html)
+
+    const detectionResults = []
+
+    for (const elm of dom.window.document.body.children) {
+        if (elm.tagName === 'SPAN' && elm.classList.contains('programlist')) {
+            const detectionResult = {
+                title: '',
+                detail: {
+                    newElementNum: 0,
+                    majorElementNum: 0,
+                    majorTailPathNum: 0,
+                    minorElementNum: 0,
+                }
+            }
+
+            for (const elm2 of elm.children) {
+                if (elm2.tagName === 'H2') {
+                    detectionResult.title = elm2.textContent ?? ''
+                }
+                else if(elm2.tagName === 'H3') {
+                    const text = elm2.textContent
+
+                    if(text?.includes('new elements')) {
+                        const detectionDetail = extractDetectionDetail(text)
+                        detectionResult.detail = detectionDetail
+                    }
+                }
+            }
+
+            detectionResults.push(detectionResult)
+        }
+    }
 
     io.close()
 }

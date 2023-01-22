@@ -31,7 +31,28 @@ export class Path {
         return endsWith(this.value, keyChain)
     }
 
+    isNew(pathsLearned: Path[]): boolean {
+        const pathSame = pathsLearned.find(pathLearned => {
+            return pathLearned.equals(this)
+        })
+
+        if (pathSame === undefined) {
+            return true
+        }
+        else {
+            return false
+        }
+    }
+
+    isLearned(pathsLearned: Path[]): boolean {
+        return !this.isNew(pathsLearned)
+    }
+
     isMinor(pathsLearned: Path[]): boolean {
+        if (this.getLength() < 3) {
+            return false
+        }
+
         let existsPathSameEndExclusive = false
         let existsPathSameEnd = false
         const keyChainThisEndExclusive = this.extractKeyChainEndExclusive()
@@ -55,6 +76,14 @@ export class Path {
 
     toStringForCsv(): string {
         return this.value.join(',')
+    }
+
+    getLength(): number {
+        return this.value.length
+    }
+
+    equals(path: Path): boolean {
+        return equals(path.value, this.value)
     }
 
     static fromArray(keyChain: string[]): Path {
@@ -90,5 +119,10 @@ export class Path {
         return this.getKeyChains([], obj).map(keyChain => {
             return new Path(keyChain)
         })
+    }
+
+    static fromPathString(pathStr: string): Path {
+        const keyChain = pathStr.split('/')
+        return this.fromArray(keyChain)
     }
 }

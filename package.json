@@ -11,6 +11,8 @@
     "start": "ts-node --files -r tsconfig-paths/register",
     "learn": "yarn start src/entries/learn.ts",
     "analyze": "yarn start src/entries/analyze.ts",
+    "and": "yarn start src/entries/and.ts",
+    "sub": "yarn start src/entries/sub.ts",
     "test": "jest"
   },
   "dependencies": {

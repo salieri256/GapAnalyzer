@@ -17,20 +17,19 @@ const analyze = async () => {
     }
     const pathFilePathsLearned = process.argv[3]
 
-    if (process.argv[4] === undefined) {
-        throw new Error('Output-file path is required.')
-    }
-    const pathFileOutput = process.argv[4]
 
-    const streamWritable = createWriteStream(pathFileOutput)
-    streamWritable.write(`name,major,minor\n`)
+    const pathFileOutput = process.argv[4]
 
     const bufferPathsLearned = await readFile(pathFilePathsLearned)
     const textPathsLearned = bufferPathsLearned.toString()
     const arrayCsv = parseCsvToArray(textPathsLearned)
     const pathsLearnedPrior = arrayCsv.map(keyChain => Path.fromArray(keyChain))
 
+    console.log(`based: ${pathFileOutput}`)
+
     for (const nameFileAnalysis of namesFileAnalysis) {
+        let numberLearned = 0
+        let numberNew = 0
         let numberMinor = 0
         let numberMajor = 0
 
@@ -39,23 +38,36 @@ const analyze = async () => {
         const objectXml = parseXmlToObject(textAnalysis)
         const pathsAnalysis = Path.fromObject(objectXml)
 
-        for (const pathAnalysis of pathsAnalysis) {
-            const isMinor = pathAnalysis.isMinor(pathsLearnedPrior)
+        const streamWritableMinor = createWriteStream(`samples/minors/${pathFileOutput}_${nameFileAnalysis}.csv`)
+        const streamWritableMajor = createWriteStream(`samples/majors/${pathFileOutput}_${nameFileAnalysis}.csv`)
 
+        for (const pathAnalysis of pathsAnalysis) {
+            const isLearned = pathAnalysis.isLearned(pathsLearnedPrior)
+            if (isLearned) {
+                numberLearned++
+                continue
+            }
+            numberNew++
+
+            const isMinor = pathAnalysis.isMinor(pathsLearnedPrior)
             if (isMinor) {
-                numberMinor++;
+                numberMinor++
+
+                const textWritten = pathAnalysis.toString()
+                streamWritableMinor.write(`${textWritten}\n`)
             }
             else {
-                numberMajor++;
-                console.log(pathAnalysis.toString())
+                numberMajor++
+
+                const textWritten = pathAnalysis.toString()
+                streamWritableMajor.write(`${textWritten}\n`)
             }
         }
 
-        const textWritten = `${nameFileAnalysis},${numberMajor},${numberMinor}`
-        streamWritable.write(`${textWritten}\n`)
-    }
+        console.log(`${nameFileAnalysis} -> alreadyLearned: ${numberLearned}, new: ${numberNew} (majors: ${numberMajor}, minors: ${numberMinor})`)
 
-    streamWritable.end()
+        streamWritableMajor.end()
+    }
 }
 
 analyze()
